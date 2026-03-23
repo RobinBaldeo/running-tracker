@@ -1,0 +1,24 @@
+[project]
+name = "running-tracker"
+version = "0.1.0"
+description = "Personal running tracker with Garmin Connect sync"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.30",
+    "pydantic-settings>=2.7",
+    "garminconnect>=0.2",
+    "alembic>=1.14",
+    "pyyaml>=6.0",
+    "httpx>=0.28",
+    "fastapi-mcp>=0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]

@@ -1,0 +1,25 @@
+weather:
+  forecast_url: "https://api.open-meteo.com/v1/forecast"
+  archive_url: "https://archive-api.open-meteo.com/v1/archive"
+
+important_sleep_fields:
+- dailySleepDTO
+- sleepMovement
+- remSleepData
+- sleepLevels
+- sleepRestlessMoments
+- restlessMomentsCount
+- wellnessEpochRespirationDataDTOList
+- wellnessEpochRespirationAveragesList
+- respirationVersion
+- sleepHeartRate
+- sleepStress
+- sleepBodyBattery
+- skinTempDataExists
+- hrvData
+- breathingDisruptionData
+- avgOvernightHrv
+- hrvStatus
+- bodyBatteryChange
+- restingHeartRate
+
