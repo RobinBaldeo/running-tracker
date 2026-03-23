@@ -2,4 +2,4 @@
 dockerfilePath = "cron/Dockerfile"
 
 [deploy]
-cronSchedule = "55 1 * * *"
+cronSchedule = "0 15 * * *"
