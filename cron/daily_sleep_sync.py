@@ -7,7 +7,9 @@ import sys
 import time
 from datetime import date, datetime, timedelta, timezone
 
+import garth
 import psycopg2
+from garth.auth_tokens import OAuth1Token, OAuth2Token
 from psycopg2.extras import execute_values
 from garminconnect import Garmin
 
@@ -155,21 +157,40 @@ ON CONFLICT (calendar_date) DO UPDATE SET
 
 def main():
     db_url = os.environ.get("DATABASE_URL")
-    garmin_email = os.environ.get("GARMIN_EMAIL")
-    garmin_password = os.environ.get("GARMIN_PASSWORD")
+    garmin_tokens_json = os.environ.get("GARMIN_TOKENS")
 
-    if not all([db_url, garmin_email, garmin_password]):
-        log.error("Missing env vars. Need DATABASE_URL, GARMIN_EMAIL, GARMIN_PASSWORD")
+    if not db_url:
+        log.error("Missing DATABASE_URL env var")
         sys.exit(1)
 
     # Authenticate to Garmin
-    log.info("Logging in to Garmin Connect...")
-    garmin = Garmin(garmin_email, garmin_password)
-    try:
-        garmin.login()
-    except Exception as e:
-        log.error("Garmin login failed: %s", e)
-        sys.exit(1)
+    garmin = Garmin()
+    if garmin_tokens_json:
+        log.info("Restoring Garmin session from GARMIN_TOKENS...")
+        try:
+            tokens = json.loads(garmin_tokens_json)
+            garmin.garth = garth.Client(
+                oauth1_token=OAuth1Token(**tokens["oauth1"]),
+                oauth2_token=OAuth2Token(**tokens["oauth2"]),
+            )
+            garmin.display_name = garmin.get_full_name()
+            log.info("Token-based auth succeeded (user: %s)", garmin.display_name)
+        except Exception as e:
+            log.error("Failed to restore Garmin tokens: %s", e)
+            sys.exit(1)
+    else:
+        garmin_email = os.environ.get("GARMIN_EMAIL")
+        garmin_password = os.environ.get("GARMIN_PASSWORD")
+        if not all([garmin_email, garmin_password]):
+            log.error("Missing env vars. Need GARMIN_TOKENS or GARMIN_EMAIL + GARMIN_PASSWORD")
+            sys.exit(1)
+        log.info("Logging in to Garmin Connect with email/password...")
+        garmin = Garmin(garmin_email, garmin_password)
+        try:
+            garmin.login()
+        except Exception as e:
+            log.error("Garmin login failed: %s", e)
+            sys.exit(1)
 
     # Fetch last N days
     today = date.today()
